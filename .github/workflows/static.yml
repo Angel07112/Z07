@@ -1,0 +1,144 @@
+<!doctype html>
+
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Reproductor Beta de Zayro07</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+    }
+    #background-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    .overlay {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100%;
+      padding: 40px 20px 20px 20px;
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 20px 0;
+      font-size: 2rem;
+      letter-spacing: 1px;
+      text-shadow: 0 3px 8px rgba(0,0,0,0.6);
+    }
+    .controls {
+      display: flex;
+      gap: 20px;
+      margin-top: 150px; /* Mueve los botones al centro vertical de la pantalla */
+    }
+    .controls button {
+      padding: 14px 20px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .controls button:hover {
+      background: rgba(255,255,255,0.35);
+      transform: scale(1.1);
+    }
+    #song-title {
+      margin-top: 10px;
+      font-size: 20px;
+      font-weight: bold;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.7);
+    }
+  </style>
+</head>
+<body>
+  <!-- Video de fondo de YouTube embebido -->
+  <iframe id="background-video" src="https://www.youtube.com/embed/YSods2n3Qs4?autoplay=1&mute=1&loop=1&playlist=YSods2n3Qs4&controls=0&modestbranding=1&rel=0" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>  <div class="overlay">
+      <div>
+        <h1>🎵 Reproductor Beta de Zayro07 🎶</h1>
+        <div id="song-title">Cargando...</div>
+        <div class="controls">
+          <button onclick="prevSong()">⏮</button>
+          <button onclick="togglePlay()">▶️/⏸</button>
+          <button onclick="nextSong()">⏭</button>
+        </div>
+      </div>
+  </div>  <script>
+    const songs = [
+      {title: "Canción 1", id: "jY3j6tvPXFE"},
+      {title: "Canción 2", id: "7Ko_IQ0WPjo"},
+      {title: "Canción 3", id: "L2EmaRBEOx0"}
+    ];
+    let currentSong = 0;
+    let player;
+
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('hidden-player', {
+        height: '0',
+        width: '0',
+        videoId: songs[currentSong].id,
+        playerVars: { 'autoplay': 0, 'controls': 0 },
+        events: { 'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange }
+      });
+    }
+
+    function onPlayerReady() {
+      updateTitle();
+    }
+
+    function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.ENDED) {
+        nextSong();
+      }
+    }
+
+    function togglePlay() {
+      const state = player.getPlayerState();
+      if (state === YT.PlayerState.PLAYING) {
+        player.pauseVideo();
+      } else {
+        player.playVideo();
+      }
+    }
+
+    function nextSong() {
+      currentSong = (currentSong + 1) % songs.length;
+      loadSong();
+    }
+
+    function prevSong() {
+      currentSong = (currentSong - 1 + songs.length) % songs.length;
+      loadSong();
+    }
+
+    function loadSong() {
+      player.loadVideoById(songs[currentSong].id);
+      updateTitle();
+    }
+
+    function updateTitle() {
+      document.getElementById('song-title').textContent = songs[currentSong].title;
+    }
+  </script>  <div id="hidden-player"></div>
+</body>
+</html>
